@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Closed Weather</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen flex bg-gradient-to-br from-slate-100 to-slate-200">
+    <aside class="w-64 bg-white/80 backdrop-blur shadow-sm p-4">
+      <h2 class="font-semibold text-sm mb-4">Favoritos</h2>
+      <div id="savedCities" class="space-y-1"></div>
+      <button
+        id="clearCities"
+        class="mt-6 text-xs text-red-500 hover:underline"
+      >
+        Limpiar lista
+      </button>
+    </aside>
+    <div class="flex-1">
+      <header class="sticky top-0 z-50 backdrop-blur bg-white/70 shadow-sm">
+        <nav
+          class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <span class="font-semibold text-lg tracking-tight text-gray-800">
+              Closed Weather
+            </span>
+          </div>
+          <div class="text-sm text-gray-500">Weather Recommendations</div>
+        </nav>
+      </header>
+      <main>
+        <div class="flex flex-col items-center mt-6">
+          <form id="searchForm" class="flex gap-2 justify-center mt-6 relative">
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search city..."
+              class="border rounded px-3 py-2 w-64"
+              autocomplete="off"
+            />
+
+            <div
+              id="suggestions"
+              class="absolute top-12 w-64 bg-white border border-gray-200 rounded shadow-md hidden z-50"
+            ></div>
+          </form>
+
+          <span
+            id="errorMessage"
+            class="hidden text-red-600 text-sm mt-3 bg-red-50 px-4 py-2 rounded-md border border-red-200"
+          ></span>
+        </div>
+        <section>
+          <article id="current"></article>
+        </section>
+        <section>
+          <article id="forecast"></article>
+        </section>
+      </main>
+      <footer class="text-center text-sm text-gray-600 py-6">
+        Powered by
+        <a href="https://www.weatherapi.com/" class="text-indigo-600">
+          OpenWeather.org
+        </a>
+      </footer>
+    </div>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
