@@ -43,41 +43,58 @@ export function weatherCard(props) {
   `;
 }
 
-export function weatherForecastCard(props) {
+export function weatherForecastCard(current, props) {
   const container = document.querySelector("#forecast");
-  const bigIcon = props.current.condition.icon.replace("64x64", "128x128");
+
+  const now = new Date();
+  const next24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+  const nextItems = props.list.filter((item) => {
+    const d = new Date(item.dt_txt);
+    return d >= now && d <= next24h;
+  });
+
+  const iconCode = current.weather[0].icon;
+  const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
   container.innerHTML = `
   <div class="max-w-md p-8 mx-auto mt-16 rounded-lg bg-slate-100 text-gray-800 border shadow-md">
-	<div class="flex justify-between space-x-8">
-		<div class="flex flex-col items-center">
-			<img src="https:${bigIcon}" alt="${props.current.condition.text} weather icon" class="w-24 h-24">
-			<h2 class="text-xl font-semibold">${props.location.name}</h2>
-    		<p class="text-gray-500">${props.location.region}</p>
-		</div>
-		<span class="font-bold text-8xl">${props.current.temp_c}°</span>
-	</div>
-	<div class="flex justify-between mt-8 space-x-4 text-gray-600">
-        ${props.forecast.forecastday.map((day) => weatherForecastItem(day)).join("")}
-	</div>
-</div>
-<div class="mt-4 flex justify-center">
+    
+    <div class="flex justify-between">
+      <div class="flex flex-col items-center">
+        <img src="${iconUrl}" class="w-24 h-24">
+        <h2 class="text-xl font-semibold">${current.name}</h2>
+      </div>
+      <span class="font-bold text-7xl">${current.main.temp}°</span>
+    </div>
+
+    <div class="mt-8 flex gap-6 overflow-x-auto pb-3">
+      ${nextItems.map((day) => weatherForecastItem(day)).join("")}
+    </div>
+
+  </div>
+  <div class="mt-4 flex justify-center">
   <button
     id="saveCityBtn"
     class="bg-indigo-500 text-white text-sm px-3 py-1 rounded hover:bg-indigo-600"
-    data-city="${props.location.name}"
+    data-city="${current.name}" data-lat="${current.coord.lat}" data-lon="${current.coord.lon}"
   >
     Guardar ubicación
   </button>
 </div>
   `;
 }
+
 export function weatherForecastItem(props) {
-  const date = new Date(props.date).toDateString().split(" ")[0];
+  const hour = new Date(props.dt_txt).getHours();
+  const iconCode = props.weather[0].icon;
+  const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
   return `
     <div class="flex flex-col items-center space-y-1">
-			<span class="uppercase">${date}</span>
-            <img src="https:${props.day.condition.icon}" alt="${props.day.condition.icon} weather icon">
-			<span>${props.day.avgtemp_c}°</span>
+			<span class="uppercase">${hour}:00</span>
+            <img src="${iconUrl}" alt="Icono de ${props.weather[0].description} weather icon">
+			<span>${props.main.temp}°</span>
 		</div>
     `;
 }
@@ -91,9 +108,9 @@ export function renderSavedCities() {
       (city) => `
     <button
       class="w-full text-left text-sm px-3 py-2 rounded hover:bg-gray-100"
-      data-city="${city}"
+      data-city="${city.name}" data-lat="${city.lat}" data-lon="${city.lon}"
     >
-      ${city}
+      ${city.name}
     </button>
   `,
     )
@@ -103,7 +120,9 @@ export function renderSavedCities() {
 export function saveCity(city) {
   const cities = JSON.parse(localStorage.getItem("cities")) || [];
 
-  if (!cities.includes(city)) {
+  const exists = cities.some((c) => c.lat === city.lat && c.lon === city.lon);
+
+  if (!exists) {
     cities.push(city);
     localStorage.setItem("cities", JSON.stringify(cities));
   }

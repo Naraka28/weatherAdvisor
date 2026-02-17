@@ -1,4 +1,8 @@
-import { getCity, getForecastWeather } from "../services/weather.service.js";
+import {
+  getCity,
+  getCurrentWeather,
+  getForecastWeather,
+} from "../services/weather.service.js";
 import { weatherForecastCard } from "../ui/weatherCard.js";
 
 export function renderHomePage() {
@@ -43,14 +47,13 @@ export function renderHomePage() {
   async function handleSuggest(query) {
     try {
       const results = await getCity(query);
-      console.log(results);
       renderSuggestions(results);
     } catch (err) {
       console.error(err);
     }
   }
 
-  const debouncedSuggest = debounce(handleSuggest, 400);
+  const debouncedSuggest = debounce(handleSuggest, 500);
 
   input.addEventListener("input", (e) => {
     const q = e.target.value.trim();
@@ -71,15 +74,17 @@ export function renderHomePage() {
     const lat = btn.dataset.lat;
     const lon = btn.dataset.lon;
 
-    console.log(city, lat, lon);
-
     input.value = city;
     box.classList.add("hidden");
 
     try {
       const data = await getForecastWeather(lat, lon);
-      console.log(data);
+      const current = await getCurrentWeather(lat, lon);
+      console.log("Current info:", current);
+      console.log("Box info:", data);
+      weatherForecastCard(current, data);
     } catch (err) {
+      console.error(err);
       errorSpan.textContent = "No se pudo obtener el clima";
       errorSpan.classList.remove("hidden");
     }
