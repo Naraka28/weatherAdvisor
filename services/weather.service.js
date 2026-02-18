@@ -1,4 +1,4 @@
-import { API_KEY } from "../env.js";
+const API_KEY = process.env.API_KEY;
 
 const circuitBreaker = {
   state: "CLOSED",
