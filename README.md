@@ -36,3 +36,9 @@ Abre `index.html` en tu navegador.
 ## URL de la pagina hosteada
 
 https://weather-advisor-three.vercel.app/
+
+## Vista previa
+
+A continuación se muestra una vista de la interfaz de usuario:
+
+![Vista previa de WeatherAdvisor](assets/preview.png)
