@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClosedWeather</title>
+    <title>WeatherAdvisor</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
       rel="stylesheet"
@@ -18,16 +18,13 @@
     <style type="text/tailwindcss">
       @theme {
         --color-cream: #fffbde;
-
         --color-sky: #91c8e4;
         --color-steel: #749bc2;
         --color-ocean: #4682a9;
         --color-deep: #2d4a5e;
-
         --color-page: #e8e5df;
         --color-surface: #f0ede7;
         --color-mist: #daeef8;
-
         --font-sans: "DM Sans", sans-serif;
         --font-display: "Instrument Serif", serif;
       }
@@ -43,6 +40,7 @@
         background-color: var(--color-page);
       }
 
+      /* Utilidad para scrollbar */
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
@@ -79,22 +77,30 @@
       #suggestions button:not(:last-child) {
         border-bottom: 1px solid rgba(0, 0, 0, 0.06);
       }
-      #suggestions button:hover {
-        background-color: rgba(0, 0, 0, 0.04);
-      }
     </style>
   </head>
 
-  <body class="flex relative min-h-screen">
+  <body class="flex flex-col lg:flex-row relative min-h-screen">
+    <div
+      id="sidebarOverlay"
+      class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity"
+    ></div>
+
     <aside
-      class="sidebar w-60 shrink-0 flex flex-col h-screen sticky top-0 z-10"
+      id="sidebar"
+      class="sidebar w-64 shrink-0 flex flex-col h-screen fixed inset-y-0 left-0 z-50 -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:sticky lg:top-0"
     >
-      <div class="px-5 pt-6 pb-4 border-b border-black/7">
+      <div
+        class="px-5 pt-6 pb-4 border-b border-black/7 flex justify-between items-center"
+      >
         <div class="flex items-center gap-2.5">
           <span class="font-display text-lg italic text-ocean"
-            >ClosedWeather</span
+            >WeatherAdvisor</span
           >
         </div>
+        <button id="closeSidebar" class="lg:hidden text-stone-400">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
       </div>
 
       <div class="flex-1 overflow-y-auto no-scrollbar px-3 py-5 space-y-5">
@@ -177,8 +183,17 @@
     </aside>
 
     <div class="flex-1 flex flex-col min-h-screen relative z-10">
-      <header class="site-header sticky top-0 z-50">
-        <nav class="max-w-2xl mx-auto px-6 py-3 flex items-center gap-4">
+      <header class="site-header sticky top-0 z-40">
+        <nav
+          class="max-w-5xl mx-auto px-4 lg:px-6 py-3 flex items-center gap-3"
+        >
+          <button
+            id="openSidebar"
+            class="lg:hidden p-2 text-ocean hover:bg-black/5 rounded-xl transition-colors"
+          >
+            <i class="fa-solid fa-bars-staggered text-xl"></i>
+          </button>
+
           <div id="searchForm" class="relative flex-1">
             <div
               class="search-wrap flex items-center gap-2.5 bg-page border border-stone-300/60 rounded-2xl px-4 py-2.5 shadow-sm transition-all duration-200"
@@ -229,24 +244,22 @@
           </div>
         </nav>
       </header>
-      <div class="max-w-2xl mx-auto w-full px-6 mt-4">
+
+      <div class="max-w-5xl mx-auto w-full px-4 lg:px-6 mt-4">
         <span
           id="errorMessage"
           class="hidden text-sm text-red-500 bg-red-50 border border-red-100 px-4 py-2.5 rounded-xl block"
-        >
-        </span>
+        ></span>
       </div>
 
       <main class="flex-1 w-full px-4 py-6 flex flex-col items-center">
-        <section><article id="current"></article></section>
-
         <div
           id="contentWrapper"
-          class="hidden flex flex-col gap-4 w-full max-w-5xl"
+          class="hidden flex flex-col gap-6 w-full max-w-5xl"
         >
           <div
             id="weatherGrid"
-            class="flex flex-col lg:flex-row gap-4 items-stretch w-full"
+            class="flex flex-col lg:flex-row gap-6 items-stretch w-full"
           >
             <article id="forecast" class="flex flex-col shrink-0"></article>
             <article
@@ -254,19 +267,18 @@
               class="flex flex-col flex-1 min-w-0"
             ></article>
           </div>
-
           <article id="recommendations" class="w-full"></article>
         </div>
 
         <div
           id="emptyState"
-          class="flex flex-col items-center justify-center py-28 px-6 text-center"
+          class="flex flex-col items-center justify-center py-20 lg:py-28 px-6 text-center"
         >
           <div
-            class="w-[4.5rem] h-[4.5rem] rounded-3xl bg-mist flex items-center justify-center mb-5 shadow-sm"
+            class="w-20 h-20 rounded-3xl bg-mist flex items-center justify-center mb-5 shadow-sm"
           >
             <svg
-              class="w-9 h-9 text-steel"
+              class="w-10 h-10 text-steel"
               fill="none"
               stroke="currentColor"
               stroke-width="1.5"
@@ -277,7 +289,7 @@
               />
             </svg>
           </div>
-          <p class="font-display italic text-2xl text-ocean mb-1.5">
+          <p class="font-display italic text-2xl lg:text-3xl text-ocean mb-1.5">
             ¿Qué clima hace hoy?
           </p>
           <p class="text-sm text-stone-400">
@@ -289,12 +301,33 @@
 
     <script type="module" src="main.js"></script>
     <script>
+      const sidebar = document.getElementById("sidebar");
+      const openBtn = document.getElementById("openSidebar");
+      const closeBtn = document.getElementById("closeSidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+
+      function toggleMenu() {
+        sidebar.classList.toggle("-translate-x-full");
+        overlay.classList.toggle("hidden");
+        document.body.classList.toggle("overflow-hidden");
+      }
+
+      openBtn.addEventListener("click", toggleMenu);
+      closeBtn.addEventListener("click", toggleMenu);
+      overlay.addEventListener("click", toggleMenu);
+
+      document.addEventListener("click", (e) => {
+        if (window.innerWidth < 1024 && e.target.closest(".city-btn")) {
+          toggleMenu();
+        }
+      });
+
       const obs = new MutationObserver(() => {
         const f = document.querySelector("#forecast");
         const e = document.querySelector("#emptyState");
         const w = document.querySelector("#contentWrapper");
         if (f && f.innerHTML.trim()) {
-          e.style.display = "none";
+          e.classList.add("hidden");
           w.classList.remove("hidden");
         }
       });

@@ -26,7 +26,7 @@ export function weatherForecastCard(current, props) {
     <div class="flex items-start justify-between">
       <div>
         <div class="text-[10px] font-medium uppercase tracking-widest text-steel mb-1">Now</div>
-        <div class="font-light leading-none text-9xl text-deep">${temp}°</div>
+        <div class="font-light leading-none text-7xl md:text-9xl text-deep">${temp}°</div>
         <div class="text-base font-semibold mt-1 text-deep">${current.name}, ${current.sys.country}</div>
       </div>
       <div class="flex flex-col items-end pt-1">
