@@ -35,4 +35,4 @@ Abre `index.html` en tu navegador.
 
 ## URL de la pagina hosteada
 
-https://weatheradvisorlasso.netlify.app
+https://weather-advisor-three.vercel.app/
